@@ -5,13 +5,12 @@ var jwt = require('jsonwebtoken');
 module.exports = {
 
 	register: async function (req, res) {
-
 		let member_exist = await Member.findOne({ member_email: req.body.member_email });
 		if (member_exist) {
 			return res.send({ response: false, error: 'That member already exists!' });
 		} else {
 			const newMember = new Member(req.body)
-			const salt = await bcrypt.genSalt(process.env.SALT_FACTOR)
+			const salt = await bcrypt.genSalt(Number(process.env.SALT_FACTOR))
 			newMember.member_password = await bcrypt.hash(newMember.member_password, salt)
 			newMember.save()
 				.then(newMember => {
@@ -23,7 +22,6 @@ module.exports = {
 		}
 	},
 	login: async function (req, res) {
-
 		let member = await Member.findOne({ member_email: req.body.member_email })
 
 		if (!member) {
